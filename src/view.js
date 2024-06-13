@@ -7,7 +7,9 @@ import {
 const isEmpty = obj => [Object, Array].includes((obj || {}).constructor) && !Object.entries((obj || {})).length;
 
 const updateURL = async (value, name) => {
+
   const url = new URL(window.location);
+  const { actions } = await import('@wordpress/interactivity-router');
 
   if ('pcat' === name) {
 	  if (!isEmpty(value)) {
@@ -23,23 +25,18 @@ const updateURL = async (value, name) => {
 			url.searchParams.delete('search');
 		}
 	}
-	// await console.log(url.search)
 
-	await store('core/router').actions.navigate(`${window.location.pathname}${url.search}`);
+	await actions.navigate(`${window.location.pathname}${url.search}`);
 };
 
-const { state, actions } = store('instantSearch', {
+const { state } = store('instantSearch', {
   actions: {
     *updateSearch() {
       const { ref } = getElement();
       const { value, name } = ref;
 
-      const { actions } = yield import(
-        '@wordpress/interactivity-router'
-      );
-
-      // Don't navigate if the search didn't really change.
-		  if ('search' === name && value === state.search) return;
+    // Don't navigate if the search didn't really change.
+	if ('search' === name && value === state.search) return;
 	if ('pcat' === name && value === state.pcat) return;
 
       if ('pcat' === name) {
